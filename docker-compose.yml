@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  # Servicio de PostgreSQL
+  db:
+    image: postgres:14-alpine
+    container_name: fastapi-todo-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todo-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data #persistencia de datos
+    ports:
+      - "5432:5432" # Exponer puerto si se necesita acceso externo
+    restart: unless-stopped
+    healthcheck: # Recomendado
+      test: ["CMD-SHELL", "pg_isready -U postgres -d todo-db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fastapi-todo-net
+
+# volumen para persistir datos de PostgreSQL
+volumes:
+  postgres_data:
+
+networks:
+  fastapi-todo-net:
+    driver: bridge
+    name: fastapi-todo-net # nombre personalizado para la red
